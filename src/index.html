@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlterCOD Launcher</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#060708;--bg2:#0d0f11;--bg3:#13161a;--bg4:#1a1e24;
+    --border:#1e2329;--border2:#252b33;
+    --green:#4afe7a;--green2:#2dcc5a;
+    --grey:#5a6478;--light:#8a95a3;--white:#e8eaed;
+    --red:#ff4444;--yellow:#ffc400;--blue:#5b8fff;
+  }
+  body{background:var(--bg);color:var(--white);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;user-select:none;height:100vh}
+  
+  /* TITLEBAR */
+  #titlebar{height:38px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;-webkit-app-region:drag;flex-shrink:0}
+  #titlebar .logo{font-size:15px;font-weight:800;letter-spacing:1px;text-transform:uppercase;-webkit-app-region:no-drag}
+  #titlebar .logo .gr{color:#c4cdd9}
+  #titlebar .logo .gn{color:var(--green)}
+  #titlebar .ver{font-size:10px;color:var(--grey);margin-left:8px;font-family:'Consolas',monospace}
+  #titlebar .spacer{flex:1}
+  #titlebar .win-btns{display:flex;-webkit-app-region:no-drag}
+  #titlebar .win-btn{width:46px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;font-size:12px;color:var(--light)}
+  #titlebar .win-btn:hover{background:var(--bg4)}
+  #titlebar .win-btn.close:hover{background:#c42b1c;color:#fff}
+
+  /* LAYOUT */
+  #app{display:flex;height:calc(100vh - 38px)}
+  
+  /* SIDEBAR */
+  #sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+  #sidebar::-webkit-scrollbar{width:4px}
+  #sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .sidebar-section{padding:20px 12px 8px;font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:2px;font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:all .15s;color:var(--light);font-size:13px;border-radius:6px;margin:1px 8px;position:relative}
+  .nav-item:hover{background:var(--bg3);color:var(--white)}
+  .nav-item.active{background:rgba(74,254,122,.1);color:var(--green)}
+  .nav-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .nav-item .badge{position:absolute;right:10px;font-size:10px;background:var(--green);color:#000;padding:1px 6px;border-radius:10px;font-weight:700}
+  .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+  .sidebar-footer a{display:block;color:var(--grey);font-size:12px;text-decoration:none;padding:6px 0;transition:color .15s;cursor:pointer}
+  .sidebar-footer a:hover{color:var(--green)}
+
+  /* MAIN CONTENT */
+  #main{flex:1;overflow-y:auto;background:var(--bg)}
+  #main::-webkit-scrollbar{width:6px}
+  #main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  /* PAGES */
+  .page{display:none;padding:28px 32px;animation:fadeIn .2s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* HOME PAGE */
+  .home-hero{background:linear-gradient(135deg,rgba(74,254,122,.04) 0%,transparent 50%),var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden}
+  .home-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(74,254,122,.06),transparent 70%);pointer-events:none}
+  .home-hero h1{font-size:26px;font-weight:800;margin-bottom:6px}
+  .home-hero h1 span{color:var(--green)}
+  .home-hero p{color:var(--light);font-size:14px;max-width:500px;line-height:1.6}
+  .home-stats{display:flex;gap:24px;margin-top:20px}
+  .stat{text-align:center}
+  .stat .n{font-size:22px;font-weight:800;color:var(--green)}
+  .stat .l{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+  /* GAMES GRID */
+  .section-title{font-size:13px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:32px}
+  .game-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+  .game-card:hover{border-color:var(--c,var(--green));transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .game-card .thumb{width:100%;height:110px;object-fit:cover;display:block;background:var(--bg3)}
+  .game-card .info{padding:12px 14px}
+  .game-card .title{font-size:13px;font-weight:700;margin-bottom:2px}
+  .game-card .year{font-size:11px;color:var(--grey)}
+  .game-card .status{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px}
+  .game-card .status .dot{width:5px;height:5px;border-radius:50%}
+  .game-card .installed-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--c,var(--green));opacity:.6}
+
+  /* GAME DETAIL PAGE */
+  .game-hero{border-radius:14px;overflow:hidden;position:relative;height:220px;margin-bottom:24px}
+  .game-hero img{width:100%;height:100%;object-fit:cover}
+  .game-hero .overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(6,7,8,.95) 30%,rgba(6,7,8,.4));display:flex;align-items:center;padding:28px 32px;gap:24px}
+  .game-hero .meta h1{font-size:28px;font-weight:800;margin-bottom:4px}
+  .game-hero .meta .sub{color:var(--light);font-size:13px;margin-bottom:16px}
+  .game-hero .meta .tags{display:flex;gap:8px}
+  .tag{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg3);border:1px solid var(--border2)}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;color:var(--grey);font-size:13px;cursor:pointer;margin-bottom:20px;transition:color .15s;background:none;border:none;padding:0}
+  .back-btn:hover{color:var(--green)}
+
+  /* DOWNLOAD SECTION */
+  .dl-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+  .dl-section h3{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .dl-path{display:flex;gap:8px;margin-bottom:16px}
+  .dl-path input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 14px;color:var(--white);font-size:13px;outline:none;transition:border .15s}
+  .dl-path input:focus{border-color:var(--green)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
+  .btn-primary{background:var(--green);color:#000}
+  .btn-primary:hover{background:var(--green2)}
+  .btn-secondary{background:var(--bg3);color:var(--light);border:1px solid var(--border2)}
+  .btn-secondary:hover{border-color:var(--green);color:var(--green)}
+  .btn-play{background:linear-gradient(135deg,var(--green),var(--green2));color:#000;font-size:15px;padding:12px 28px;border-radius:10px;font-weight:800}
+  .btn-play:hover{transform:scale(1.03);box-shadow:0 0 20px rgba(74,254,122,.3)}
+  .btn-danger{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.3)}
+  .btn-danger:hover{background:rgba(255,68,68,.2)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important}
+
+  /* PROGRESS */
+  .progress-wrap{margin-top:16px;display:none}
+  .progress-wrap.show{display:block}
+  .progress-bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:8px}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:3px;transition:width .3s;width:0%}
+  .progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--grey);font-family:'Consolas',monospace}
+
+  /* STEPS */
+  .steps{display:flex;flex-direction:column;gap:8px}
+  .step{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
+  .step-n{width:22px;height:22px;border-radius:50%;background:rgba(74,254,122,.15);border:1px solid rgba(74,254,122,.3);color:var(--green);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .step-t{font-size:13px;color:var(--light);line-height:1.5}
+
+  /* SETTINGS PAGE */
+  .settings-group{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+  .settings-group h3{font-size:13px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+  .setting-row:last-child{border-bottom:none}
+  .setting-label{font-size:13px}
+  .setting-desc{font-size:11px;color:var(--grey);margin-top:2px}
+  .toggle{width:40px;height:22px;border-radius:11px;background:var(--bg4);border:1px solid var(--border2);cursor:pointer;position:relative;transition:background .2s}
+  .toggle.on{background:var(--green)}
+  .toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+  .toggle.on::after{left:21px}
+
+  /* KEYS */
+  .keys-grid{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .key-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:9px 14px;color:var(--light);font-family:'Consolas',monospace;font-size:12px;cursor:pointer;text-align:left;transition:all .2s;letter-spacing:1px}
+  .key-btn:hover{border-color:var(--c,var(--green));color:var(--c,var(--green))}
+
+  /* NOTE */
+  .note{padding:12px 16px;border-radius:8px;font-size:12px;line-height:1.6;margin-bottom:12px}
+  .note-warn{background:rgba(255,196,0,.07);border:1px solid rgba(255,196,0,.3);color:#ffc400}
+  .note-info{background:rgba(74,254,122,.05);border:1px solid rgba(74,254,122,.2);color:var(--green)}
+
+  /* NEWS */
+  .news-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:12px}
+  .news-item .news-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .news-item .news-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+  .news-item h4{font-size:14px;font-weight:700;margin-bottom:6px}
+  .news-item p{font-size:13px;color:var(--light);line-height:1.6}
+  .news-date{font-size:11px;color:var(--grey);margin-left:auto}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* TOAST */
+  #toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s}
+  #toast.show{transform:translateY(0);opacity:1}
+  #toast.success{border-color:rgba(74,254,122,.4)}
+  #toast.error{border-color:rgba(255,68,68,.4)}
+</style>
+</head>
+<body>
+
+<!-- TITLEBAR -->
+<div id="titlebar">
+  <div class="logo"><span class="gr">Alter</span><span class="gn">COD</span></div>
+  <span class="ver" id="verEl">v1.0.0</span>
+  <div class="spacer"></div>
+  <div class="win-btns">
+    <div class="win-btn" onclick="window.electronAPI.minimize()">&#x2212;</div>
+    <div class="win-btn" onclick="window.electronAPI.maximize()">&#x25A1;</div>
+    <div class="win-btn close" onclick="window.electronAPI.close()">&#x2715;</div>
+  </div>
+</div>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-section">Navigation</div>
+    <div class="nav-item active" onclick="showPage('home')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Accueil
+    </div>
+    <div class="nav-item" onclick="showPage('library')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Bibliothèque
+    </div>
+    <div class="nav-item" onclick="showPage('downloads')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+      Téléchargements
+      <span class="badge" id="dlBadge" style="display:none">0</span>
+    </div>
+    <div class="sidebar-section" style="margin-top:8px">Infos</div>
+    <div class="nav-item" onclick="showPage('news')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2z"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+      News
+    </div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Paramètres
+    </div>
+    <div class="sidebar-footer">
+      <a onclick="window.electronAPI.openExternal('https://altercod.fr')">🌐 altercod.fr</a>
+      <a onclick="window.electronAPI.openExternal('https://discord.gg/na6DuNHFkX')">💬 Discord</a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <h1>Bienvenue sur <span>AlterCOD</span></h1>
+        <p>Le launcher Call of Duty gratuit. Télécharge, installe et joue à tous tes COD préférés en quelques clics.</p>
+        <div class="home-stats">
+          <div class="stat"><div class="n">15</div><div class="l">Jeux</div></div>
+          <div class="stat"><div class="n" id="installedCount">0</div><div class="l">Installés</div></div>
+          <div class="stat"><div class="n">100%</div><div class="l">Gratuit</div></div>
+        </div>
+      </div>
+      <div class="section-title">Tous les jeux</div>
+      <div class="games-grid" id="gamesGrid"></div>
+    </div>
+
+    <!-- LIBRARY PAGE -->
+    <div class="page" id="page-library">
+      <div class="section-title">Jeux installés</div>
+      <div class="games-grid" id="libraryGrid">
+        <div style="color:var(--grey);font-size:13px;grid-column:1/-1;padding:20px 0">Aucun jeu installé pour l'instant.</div>
+      </div>
+    </div>
+
+    <!-- DOWNLOADS PAGE -->
+    <div class="page" id="page-downloads">
+      <div class="section-title">Téléchargements actifs</div>
+      <div id="dlList">
+        <div style="color:var(--grey);font-size:13px;padding:20px 0">Aucun téléchargement en cours.</div>
+      </div>
+    </div>
+
+    <!-- GAME DETAIL PAGE -->
+    <div class="page" id="page-game">
+      <button class="back-btn" onclick="showPage('home')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour
+      </button>
+      <div id="gameContent"></div>
+    </div>
+
+    <!-- NEWS PAGE -->
+    <div class="page" id="page-news">
+      <div class="section-title">Actualités</div>
+      <div class="news-item">
+        <div class="news-top">
+          <span class="news-badge" style="background:rgba(74,254,122,.15);color:var(--green)">Lancement</span>
+          <span class="news-date">01 Mars 2026</span>
+        </div>
+        <h4>🚀 AlterCOD Launcher v1.0.0 est disponible !</h4>
+        <p>Le launcher officiel AlterCOD est enfin là. Télécharge et joue à tous les Call of Duty gratuitement depuis une seule application. 15 jeux supportés dès le lancement.</p>
+      </div>
+      <div class="news-item">
+        <div class="news-top">
+          <span class="news-badge" style="background:rgba(91,143,255,.15);color:var(--blue)">Info</span>
+          <span class="news-date">01 Mars 2026</span>
+        </div>
+        <h4>🌐 Site officiel : altercod.fr</h4>
+        <p>Le site officiel AlterCOD est disponible sur altercod.fr avec des guides complets d'installation, clés multijoueur et bien plus.</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="section-title">Paramètres</div>
+      <div class="settings-group">
+        <h3>Téléchargements</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Dossier d'installation par défaut</div>
+            <div class="setting-desc" id="defaultPathLabel">C:\AlterCOD</div>
+          </div>
+          <button class="btn btn-secondary" onclick="changeDefaultPath()">Modifier</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Vitesse max de téléchargement</div>
+            <div class="setting-desc">Illimitée par défaut</div>
+          </div>
+          <select id="speedLimit" style="background:var(--bg3);border:1px solid var(--border2);color:var(--white);padding:6px 10px;border-radius:6px;font-size:12px">
+            <option value="0">Illimitée</option>
+            <option value="5">5 MB/s</option>
+            <option value="10">10 MB/s</option>
+            <option value="20">20 MB/s</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h3>Application</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Lancer au démarrage de Windows</div>
+          </div>
+          <div class="toggle" id="startupToggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Réduire dans la barre des tâches à la fermeture</div>
+          </div>
+          <div class="toggle on" id="trayToggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h3>À propos</h3>
+        <div class="setting-row">
+          <div class="setting-label">Version</div>
+          <span style="font-size:12px;color:var(--grey);font-family:'Consolas',monospace" id="aboutVer">v1.0.0</span>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Site web</div>
+          <a onclick="window.electronAPI.openExternal('https://altercod.fr')" style="color:var(--green);font-size:12px;cursor:pointer">altercod.fr</a>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Développé par</div>
+          <span style="font-size:12px;color:var(--grey)">IKAAM</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

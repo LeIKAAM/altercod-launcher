@@ -1,0 +1,40 @@
+{
+  "name": "altercod-launcher",
+  "version": "1.0.0",
+  "description": "AlterCOD - Le launcher Call of Duty gratuit",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "webtorrent": "^2.1.34"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "fr.altercod.launcher",
+    "productName": "AlterCOD",
+    "copyright": "Copyright © 2026 IKAAM",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AlterCOD"
+    }
+  }
+}
